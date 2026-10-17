@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: image-build
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kaniko
+  namespace: image-build
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ecommerce-kaniko-build
+  namespace: image-build
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 1
+  template:
+    spec:
+      serviceAccountName: kaniko
+      restartPolicy: Never
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:v1.23.2
+          args:
+            - --context=git://github.com/training-ux/observability-eks.git#refs/heads/main
+            - --context-sub-path=app
+            - --dockerfile=Dockerfile
+            - --destination=985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce:excelcloud
+            - --destination=985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce:latest
+            - --cache=false
+          volumeMounts:
+            - name: docker-config
+              mountPath: /kaniko/.docker/
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: ecr-config

@@ -17,7 +17,7 @@ permissions:
   id-token: write
 
 env:
-  AWS_ROLE_ARN: arn:aws:iam::985539781710:role/github-actions-observability-eks
+  GHA_ROLE_ARN: arn:aws:iam::985539781710:role/github-actions-observability-eks
 
 jobs:
   bootstrap:
@@ -29,8 +29,9 @@ jobs:
       - name: Configure AWS credentials (OIDC role)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.GHA_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region }}
+          role-session-name: gha-observability-eks-bootstrap
 
       - name: Install tools
         run: |
