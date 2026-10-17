@@ -1,0 +1,97 @@
+fullnameOverride: kps
+
+defaultRules:
+  create: true
+
+alertmanager:
+  enabled: true
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    retention: 7d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 2Gi
+
+grafana:
+  enabled: true
+  adminPassword: "ChangeMeObservability!"
+  service:
+    type: LoadBalancer
+  persistence:
+    enabled: false
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: default
+          orgId: 1
+          folder: Ecommerce
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      ecommerce-overview:
+        json: |
+          {
+            "title": "Ecommerce Overview",
+            "timezone": "browser",
+            "schemaVersion": 39,
+            "version": 1,
+            "refresh": "30s",
+            "panels": [
+              {
+                "type": "stat",
+                "title": "HTTP Requests",
+                "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+                "targets": [
+                  {
+                    "expr": "sum(increase(ecommerce_http_requests_total[5m]))",
+                    "legendFormat": "requests"
+                  }
+                ]
+              },
+              {
+                "type": "stat",
+                "title": "Invoices Created",
+                "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+                "targets": [
+                  {
+                    "expr": "sum(increase(ecommerce_invoices_created_total[1h]))",
+                    "legendFormat": "invoices"
+                  }
+                ]
+              },
+              {
+                "type": "timeseries",
+                "title": "Request Rate",
+                "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+                "targets": [
+                  {
+                    "expr": "sum(rate(ecommerce_http_requests_total[5m])) by (route)",
+                    "legendFormat": "{{route}}"
+                  }
+                ]
+              }
+            ]
+          }
+
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true

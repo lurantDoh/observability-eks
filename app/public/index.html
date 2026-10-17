@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Observability Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <img id="brand-logo" class="brand-logo" src="/assets/logo.svg" alt="Company logo" />
+        <div>
+          <p class="eyebrow">EKS · Helm · ArgoCD</p>
+          <h1 id="company-name">Observability Market</h1>
+          <p class="lede">Select items, review the running total, and generate a branded invoice.</p>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="catalog" aria-labelledby="catalog-title">
+          <h2 id="catalog-title">Catalog</h2>
+          <div id="product-grid" class="product-grid"></div>
+        </section>
+
+        <aside class="cart-panel" aria-labelledby="cart-title">
+          <h2 id="cart-title">Your cart</h2>
+          <div id="cart-lines" class="cart-lines"></div>
+          <dl class="totals">
+            <div><dt>Subtotal</dt><dd id="subtotal">$0.00</dd></div>
+            <div><dt>Tax (8%)</dt><dd id="tax">$0.00</dd></div>
+            <div class="grand"><dt>Total</dt><dd id="total">$0.00</dd></div>
+          </dl>
+
+          <form id="checkout-form" class="checkout-form">
+            <label>
+              Name
+              <input id="customer-name" name="customerName" required placeholder="Jane Doe" />
+            </label>
+            <label>
+              Email
+              <input id="customer-email" name="customerEmail" type="email" placeholder="jane@example.com" />
+            </label>
+            <button type="submit" id="checkout-btn" disabled>Prepare invoice</button>
+          </form>
+          <p id="status" class="status" role="status"></p>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="invoice-dialog" class="invoice-dialog">
+      <div id="invoice" class="invoice"></div>
+      <div class="invoice-actions">
+        <button type="button" id="print-invoice">Print / Save PDF</button>
+        <button type="button" id="close-invoice" class="ghost">Close</button>
+      </div>
+    </dialog>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

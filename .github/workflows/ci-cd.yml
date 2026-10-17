@@ -1,0 +1,127 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: ecommerce
+  CLUSTER_NAME: etechapp-eks-4QAQxDD3
+  IMAGE_NAME: ecommerce
+
+jobs:
+  test:
+    name: Test app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app/package.json
+
+      - name: Install and test
+        run: |
+          npm install
+          npm test
+
+  build-and-push:
+    name: Build and push image
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Image metadata
+        id: meta
+        run: |
+          TAG="${GITHUB_SHA::7}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/${ECR_REPOSITORY}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./app
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  gitops-update:
+    name: Update Helm image tag
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump chart image tag
+        run: |
+          TAG="${{ needs.build-and-push.outputs.tag }}"
+          IMAGE="${{ needs.build-and-push.outputs.image }}"
+          sed -i "s|repository: .*|repository: ${IMAGE}|" charts/ecommerce/values.yaml
+          sed -i "s|tag: \".*\"|tag: \"${TAG}\"|" charts/ecommerce/values.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add charts/ecommerce/values.yaml
+          if git diff --cached --quiet; then
+            echo "No chart changes"
+            exit 0
+          fi
+          git commit -m "chore(gitops): deploy ecommerce ${TAG}"
+          git push
+
+  deploy-status:
+    name: Verify Argo CD sync (optional)
+    needs: gitops-update
+    if: ${{ vars.ARGOCD_SERVER != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Argo CD CLI
+        run: |
+          curl -sSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x /tmp/argocd
+          sudo mv /tmp/argocd /usr/local/bin/argocd
+
+      - name: Wait for ecommerce sync
+        env:
+          ARGOCD_SERVER: ${{ vars.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+        run: |
+          argocd app wait ecommerce --sync --health --timeout 300 --server "$ARGOCD_SERVER" --grpc-web
