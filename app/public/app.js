@@ -2,7 +2,6 @@ const state = {
   products: [],
   cart: new Map(),
   currentInvoice: null,
-  emailEnabled: false,
 };
 
 const els = {
@@ -18,9 +17,7 @@ const els = {
   dialog: document.getElementById("invoice-dialog"),
   invoice: document.getElementById("invoice"),
   downloadBtn: document.getElementById("download-invoice"),
-  emailBtn: document.getElementById("email-invoice"),
   closeBtn: document.getElementById("close-invoice"),
-  customerEmail: document.getElementById("customer-email"),
 };
 
 function money(n) {
@@ -45,14 +42,19 @@ function renderProducts() {
       const qty = state.cart.get(p.id) || 0;
       return `
         <article class="product" data-id="${p.id}">
-          <div>
-            <h3>${p.name}</h3>
-            <p class="meta">${p.category} · <span class="price">${money(p.price)}</span></p>
-          </div>
-          <div class="qty-controls">
-            <button type="button" data-action="dec" aria-label="Decrease ${p.name}">−</button>
-            <span>${qty}</span>
-            <button type="button" data-action="inc" aria-label="Increase ${p.name}">+</button>
+          <img class="product-image" src="${p.image}" alt="${p.name}" loading="lazy" />
+          <div class="product-body">
+            <div class="product-copy">
+              <p class="product-category">${p.category}</p>
+              <h3>${p.name}</h3>
+              <p class="meta">${p.description}</p>
+              <p class="price">${money(p.price)}</p>
+            </div>
+            <div class="qty-controls">
+              <button type="button" data-action="dec" aria-label="Decrease ${p.name}">−</button>
+              <span>${qty}</span>
+              <button type="button" data-action="inc" aria-label="Increase ${p.name}">+</button>
+            </div>
           </div>
         </article>`;
     })
@@ -83,6 +85,7 @@ function renderCart() {
     .map(
       (i) => `
       <div class="cart-line">
+        <img class="cart-thumb" src="${i.image}" alt="" />
         <div>
           <strong>${i.name}</strong>
           <div class="meta">${i.qty} × ${money(i.price)}</div>
@@ -99,21 +102,18 @@ function renderCart() {
   renderProducts();
 }
 
-function emailStatusText(email) {
-  if (!email) return "";
-  if (email.sent) return `Email sent to ${email.to}.`;
-  if (email.skipped) return `Email not sent: ${email.reason}`;
-  if (email.error) return `Email failed: ${email.error}`;
-  return "";
-}
-
 function renderInvoice(invoice) {
   state.currentInvoice = invoice;
   const rows = invoice.lineItems
     .map(
       (i) => `
       <tr>
-        <td>${i.name}</td>
+        <td>
+          <div class="invoice-item">
+            <img src="${i.image}" alt="" />
+            <span>${i.name}</span>
+          </div>
+        </td>
         <td class="right">${i.qty}</td>
         <td class="right">${money(i.unitPrice)}</td>
         <td class="right">${money(i.lineTotal)}</td>
@@ -150,8 +150,7 @@ function renderInvoice(invoice) {
       <div><dt>Subtotal</dt><dd>${money(invoice.subtotal)}</dd></div>
       <div><dt>Tax (${Math.round(invoice.taxRate * 100)}%)</dt><dd>${money(invoice.tax)}</dd></div>
       <div class="grand"><dt>Total due</dt><dd>${money(invoice.total)}</dd></div>
-    </dl>
-    <p class="meta" id="invoice-email-status">${emailStatusText(invoice.email)}</p>`;
+    </dl>`;
   els.dialog.showModal();
 }
 
@@ -179,33 +178,6 @@ async function downloadPdf() {
   }
 }
 
-async function resendEmail() {
-  if (!state.currentInvoice?.invoiceNumber) return;
-  const email = els.customerEmail.value.trim() || state.currentInvoice.customer.email;
-  els.status.textContent = `Emailing invoice to ${email}…`;
-  els.emailBtn.disabled = true;
-  try {
-    const response = await fetch(
-      `/api/invoices/${encodeURIComponent(state.currentInvoice.invoiceNumber)}/email`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      }
-    );
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || data.email?.error || "Email failed");
-    state.currentInvoice.email = data.email;
-    const statusEl = document.getElementById("invoice-email-status");
-    if (statusEl) statusEl.textContent = emailStatusText(data.email);
-    els.status.textContent = emailStatusText(data.email) || "Email sent.";
-  } catch (err) {
-    els.status.textContent = err.message;
-  } finally {
-    els.emailBtn.disabled = false;
-  }
-}
-
 els.productGrid.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-action]");
   if (!button) return;
@@ -217,7 +189,7 @@ els.productGrid.addEventListener("click", (event) => {
 
 els.checkoutForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  els.status.textContent = "Creating invoice and emailing PDF…";
+  els.status.textContent = "Creating invoice…";
   els.checkoutBtn.disabled = true;
 
   try {
@@ -227,14 +199,12 @@ els.checkoutForm.addEventListener("submit", async (event) => {
       body: JSON.stringify({
         items: cartItems(),
         customerName: document.getElementById("customer-name").value,
-        customerEmail: els.customerEmail.value,
-        sendEmail: true,
+        customerEmail: document.getElementById("customer-email").value,
       }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Checkout failed");
-    const emailNote = emailStatusText(data.email);
-    els.status.textContent = `Invoice ${data.invoiceNumber} ready. ${emailNote}`.trim();
+    els.status.textContent = `Invoice ${data.invoiceNumber} ready — download your PDF.`;
     renderInvoice(data);
   } catch (err) {
     els.status.textContent = err.message;
@@ -244,16 +214,13 @@ els.checkoutForm.addEventListener("submit", async (event) => {
 });
 
 els.downloadBtn.addEventListener("click", downloadPdf);
-els.emailBtn.addEventListener("click", resendEmail);
 els.closeBtn.addEventListener("click", () => els.dialog.close());
 
 async function init() {
   const response = await fetch("/api/products");
   const data = await response.json();
   state.products = data.products;
-  state.emailEnabled = Boolean(data.emailEnabled);
   els.companyName.textContent = data.company;
-  els.customerEmail.required = true;
   renderCart();
 }
 

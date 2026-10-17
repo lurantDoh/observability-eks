@@ -26,12 +26,11 @@ Image registry: `985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce`
 
 Current logo: `app/public/assets/logo.jpg` (ExcelCloud).
 
-### Invoice PDF + email
+### Invoice PDF download
 
-- Checkout generates a real PDF (`GET /api/invoices/:id/pdf`)
-- The PDF is emailed to the customer address via **Amazon SES** (IRSA)
-- Sender (`EMAIL_FROM`): `enkengafac@etechconsultingsys.com` — verify this address in SES if still pending
-- Optional SMTP fallback: set `env.EMAIL_TRANSPORT=smtp` and create secret `ecommerce-smtp`
+- Checkout generates a real PDF with the ExcelCloud logo
+- Download via the **Download PDF** button or `GET /api/invoices/:id/pdf`
+- Catalog items include product images under `app/public/assets/products/`
 
 ## Repository layout
 

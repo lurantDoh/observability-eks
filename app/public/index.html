@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Observability Market</title>
+    <title>ExcelCloud Market</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,13 +19,16 @@
         <div>
           <p class="eyebrow">Cloud Engineering · Software · Consulting</p>
           <h1 id="company-name">ExcelCloud Market</h1>
-          <p class="lede">Select items, review the running total, and generate a branded ExcelCloud invoice.</p>
+          <p class="lede">Browse pictured products, build your cart, and download a branded PDF invoice.</p>
         </div>
       </header>
 
       <main class="layout">
         <section class="catalog" aria-labelledby="catalog-title">
-          <h2 id="catalog-title">Catalog</h2>
+          <div class="section-head">
+            <h2 id="catalog-title">Catalog</h2>
+            <p class="meta">Tap + to add items. Totals update instantly.</p>
+          </div>
           <div id="product-grid" class="product-grid"></div>
         </section>
 
@@ -44,16 +47,10 @@
               <input id="customer-name" name="customerName" required placeholder="Jane Doe" />
             </label>
             <label>
-              Email
-              <input
-                id="customer-email"
-                name="customerEmail"
-                type="email"
-                required
-                placeholder="jane@example.com"
-              />
+              Email <span class="optional">(optional)</span>
+              <input id="customer-email" name="customerEmail" type="email" placeholder="jane@example.com" />
             </label>
-            <button type="submit" id="checkout-btn" disabled>Prepare invoice & email PDF</button>
+            <button type="submit" id="checkout-btn" disabled>Prepare invoice</button>
           </form>
           <p id="status" class="status" role="status"></p>
         </aside>
@@ -64,7 +61,6 @@
       <div id="invoice" class="invoice"></div>
       <div class="invoice-actions">
         <button type="button" id="download-invoice">Download PDF</button>
-        <button type="button" id="email-invoice">Email invoice</button>
         <button type="button" id="close-invoice" class="ghost">Close</button>
       </div>
     </dialog>

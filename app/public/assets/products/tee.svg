@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <rect width="320" height="240" rx="24" fill="#0F3F8C"/>
+  <path d="M110 70h40l10 18h10l10-18h40l18 34-22 12v74H114V116l-22-12 18-34z" fill="#F4F7FB"/>
+  <circle cx="160" cy="128" r="18" stroke="#1F6FEB" stroke-width="6"/>
+  <path d="M148 128h24M160 116v24" stroke="#1F6FEB" stroke-width="4" stroke-linecap="round"/>
+  <text x="160" y="214" text-anchor="middle" fill="#D7E6FF" font-family="Arial,sans-serif" font-size="16" font-weight="700">Cloud Ops Tee</text>
+</svg>

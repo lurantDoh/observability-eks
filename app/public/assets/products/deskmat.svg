@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <rect width="320" height="240" rx="24" fill="#152238"/>
+  <rect x="54" y="78" width="212" height="84" rx="18" fill="#1F6FEB"/>
+  <rect x="70" y="94" width="180" height="52" rx="10" fill="#0B1F33"/>
+  <path d="M88 120h30M130 110v20M150 120h40M202 112v16" stroke="#E8F1FF" stroke-width="5" stroke-linecap="round"/>
+  <text x="160" y="214" text-anchor="middle" fill="#D7E6FF" font-family="Arial,sans-serif" font-size="15" font-weight="700">Prometheus Desk Mat</text>
+</svg>

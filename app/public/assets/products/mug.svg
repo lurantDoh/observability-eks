@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <rect width="320" height="240" rx="24" fill="#17324D"/>
+  <rect x="104" y="68" width="90" height="110" rx="16" fill="#F4F7FB"/>
+  <path d="M194 90h28a22 22 0 0 1 0 44h-28" stroke="#F4F7FB" stroke-width="14" stroke-linecap="round"/>
+  <path d="M120 96c10 8 18 8 28 0s18-8 28 0" stroke="#1F6FEB" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 118c10 8 18 8 28 0s18-8 28 0" stroke="#8AA0B8" stroke-width="5" stroke-linecap="round"/>
+  <text x="160" y="214" text-anchor="middle" fill="#D7E6FF" font-family="Arial,sans-serif" font-size="16" font-weight="700">SRE Coffee Mug</text>
+</svg>
