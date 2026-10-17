@@ -13,7 +13,10 @@
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:training-ux/observability-eks:*"
+          "token.actions.githubusercontent.com:sub": [
+            "repo:training-ux/observability-eks:*",
+            "repo:training-ux@*/observability-eks@*:*"
+          ]
         }
       }
     }
