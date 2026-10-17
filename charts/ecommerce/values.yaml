@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: 985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce

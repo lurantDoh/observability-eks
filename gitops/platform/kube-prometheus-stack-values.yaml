@@ -4,7 +4,7 @@ defaultRules:
   create: true
 
 alertmanager:
-  enabled: true
+  enabled: false
 
 prometheus:
   service:
@@ -96,4 +96,6 @@ kubeStateMetrics:
   enabled: true
 
 nodeExporter:
-  enabled: true
+  enabled: false
+
+# Small node groups (maxPods=11): keep the stack lean so apps can schedule.
