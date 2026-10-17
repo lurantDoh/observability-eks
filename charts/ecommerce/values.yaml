@@ -22,17 +22,29 @@ ingress:
 resources:
   requests:
     cpu: 50m
-    memory: 64Mi
+    memory: 128Mi
   limits:
     cpu: 250m
-    memory: 256Mi
+    memory: 512Mi
 
 env:
   COMPANY_NAME: "ExcelCloud Market"
+  EMAIL_TRANSPORT: "ses"
+  EMAIL_FROM: "enkengafac@etechconsultingsys.com"
+  SES_REGION: "us-east-1"
+
+# Optional SMTP fallback (set EMAIL_TRANSPORT=smtp and create the secret)
+smtp:
+  enabled: false
+  host: ""
+  port: "587"
+  secretName: ecommerce-smtp
 
 serviceAccount:
   create: true
   name: ecommerce
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::985539781710:role/ecommerce-ses-role
 
 podAnnotations:
   prometheus.io/scrape: "true"

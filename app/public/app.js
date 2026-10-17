@@ -1,6 +1,8 @@
 const state = {
   products: [],
   cart: new Map(),
+  currentInvoice: null,
+  emailEnabled: false,
 };
 
 const els = {
@@ -15,8 +17,10 @@ const els = {
   status: document.getElementById("status"),
   dialog: document.getElementById("invoice-dialog"),
   invoice: document.getElementById("invoice"),
-  printBtn: document.getElementById("print-invoice"),
+  downloadBtn: document.getElementById("download-invoice"),
+  emailBtn: document.getElementById("email-invoice"),
   closeBtn: document.getElementById("close-invoice"),
+  customerEmail: document.getElementById("customer-email"),
 };
 
 function money(n) {
@@ -95,7 +99,16 @@ function renderCart() {
   renderProducts();
 }
 
+function emailStatusText(email) {
+  if (!email) return "";
+  if (email.sent) return `Email sent to ${email.to}.`;
+  if (email.skipped) return `Email not sent: ${email.reason}`;
+  if (email.error) return `Email failed: ${email.error}`;
+  return "";
+}
+
 function renderInvoice(invoice) {
+  state.currentInvoice = invoice;
   const rows = invoice.lineItems
     .map(
       (i) => `
@@ -137,8 +150,60 @@ function renderInvoice(invoice) {
       <div><dt>Subtotal</dt><dd>${money(invoice.subtotal)}</dd></div>
       <div><dt>Tax (${Math.round(invoice.taxRate * 100)}%)</dt><dd>${money(invoice.tax)}</dd></div>
       <div class="grand"><dt>Total due</dt><dd>${money(invoice.total)}</dd></div>
-    </dl>`;
+    </dl>
+    <p class="meta" id="invoice-email-status">${emailStatusText(invoice.email)}</p>`;
   els.dialog.showModal();
+}
+
+async function downloadPdf() {
+  if (!state.currentInvoice?.pdfUrl) return;
+  els.status.textContent = "Preparing PDF download…";
+  try {
+    const response = await fetch(state.currentInvoice.pdfUrl);
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "PDF download failed");
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${state.currentInvoice.invoiceNumber}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    els.status.textContent = `Downloaded ${state.currentInvoice.invoiceNumber}.pdf`;
+  } catch (err) {
+    els.status.textContent = err.message;
+  }
+}
+
+async function resendEmail() {
+  if (!state.currentInvoice?.invoiceNumber) return;
+  const email = els.customerEmail.value.trim() || state.currentInvoice.customer.email;
+  els.status.textContent = `Emailing invoice to ${email}…`;
+  els.emailBtn.disabled = true;
+  try {
+    const response = await fetch(
+      `/api/invoices/${encodeURIComponent(state.currentInvoice.invoiceNumber)}/email`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }
+    );
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || data.email?.error || "Email failed");
+    state.currentInvoice.email = data.email;
+    const statusEl = document.getElementById("invoice-email-status");
+    if (statusEl) statusEl.textContent = emailStatusText(data.email);
+    els.status.textContent = emailStatusText(data.email) || "Email sent.";
+  } catch (err) {
+    els.status.textContent = err.message;
+  } finally {
+    els.emailBtn.disabled = false;
+  }
 }
 
 els.productGrid.addEventListener("click", (event) => {
@@ -152,7 +217,7 @@ els.productGrid.addEventListener("click", (event) => {
 
 els.checkoutForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  els.status.textContent = "Creating invoice…";
+  els.status.textContent = "Creating invoice and emailing PDF…";
   els.checkoutBtn.disabled = true;
 
   try {
@@ -162,12 +227,14 @@ els.checkoutForm.addEventListener("submit", async (event) => {
       body: JSON.stringify({
         items: cartItems(),
         customerName: document.getElementById("customer-name").value,
-        customerEmail: document.getElementById("customer-email").value,
+        customerEmail: els.customerEmail.value,
+        sendEmail: true,
       }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Checkout failed");
-    els.status.textContent = `Invoice ${data.invoiceNumber} ready.`;
+    const emailNote = emailStatusText(data.email);
+    els.status.textContent = `Invoice ${data.invoiceNumber} ready. ${emailNote}`.trim();
     renderInvoice(data);
   } catch (err) {
     els.status.textContent = err.message;
@@ -176,14 +243,17 @@ els.checkoutForm.addEventListener("submit", async (event) => {
   }
 });
 
-els.printBtn.addEventListener("click", () => window.print());
+els.downloadBtn.addEventListener("click", downloadPdf);
+els.emailBtn.addEventListener("click", resendEmail);
 els.closeBtn.addEventListener("click", () => els.dialog.close());
 
 async function init() {
   const response = await fetch("/api/products");
   const data = await response.json();
   state.products = data.products;
+  state.emailEnabled = Boolean(data.emailEnabled);
   els.companyName.textContent = data.company;
+  els.customerEmail.required = true;
   renderCart();
 }
 

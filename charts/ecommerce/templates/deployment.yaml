@@ -29,6 +29,30 @@ spec:
               value: {{ .Values.env.COMPANY_NAME | quote }}
             - name: PORT
               value: {{ .Values.service.targetPort | quote }}
+            - name: EMAIL_TRANSPORT
+              value: {{ .Values.env.EMAIL_TRANSPORT | quote }}
+            - name: EMAIL_FROM
+              value: {{ .Values.env.EMAIL_FROM | quote }}
+            - name: SES_REGION
+              value: {{ .Values.env.SES_REGION | quote }}
+            - name: AWS_REGION
+              value: {{ .Values.env.SES_REGION | quote }}
+            {{- if .Values.smtp.enabled }}
+            - name: SMTP_HOST
+              value: {{ .Values.smtp.host | quote }}
+            - name: SMTP_PORT
+              value: {{ .Values.smtp.port | quote }}
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.smtp.secretName }}
+                  key: SMTP_USER
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.smtp.secretName }}
+                  key: SMTP_PASS
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz

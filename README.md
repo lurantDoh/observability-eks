@@ -24,13 +24,14 @@ Image registry: `985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce`
 
 ### Replace the logo
 
-Put your logo file here (SVG or PNG):
+Current logo: `app/public/assets/logo.jpg` (ExcelCloud).
 
-```text
-app/public/assets/logo.svg
-```
+### Invoice PDF + email
 
-Or use a PNG named `logo.png` and update the `src` in `app/public/index.html` plus `logoPath` in `app/lib/cart.js`.
+- Checkout generates a real PDF (`GET /api/invoices/:id/pdf`)
+- The PDF is emailed to the customer address via **Amazon SES** (IRSA)
+- Sender (`EMAIL_FROM`): `enkengafac@etechconsultingsys.com` — verify this address in SES if still pending
+- Optional SMTP fallback: set `env.EMAIL_TRANSPORT=smtp` and create secret `ecommerce-smtp`
 
 ## Repository layout
 

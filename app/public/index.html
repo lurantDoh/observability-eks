@@ -45,9 +45,15 @@
             </label>
             <label>
               Email
-              <input id="customer-email" name="customerEmail" type="email" placeholder="jane@example.com" />
+              <input
+                id="customer-email"
+                name="customerEmail"
+                type="email"
+                required
+                placeholder="jane@example.com"
+              />
             </label>
-            <button type="submit" id="checkout-btn" disabled>Prepare invoice</button>
+            <button type="submit" id="checkout-btn" disabled>Prepare invoice & email PDF</button>
           </form>
           <p id="status" class="status" role="status"></p>
         </aside>
@@ -57,7 +63,8 @@
     <dialog id="invoice-dialog" class="invoice-dialog">
       <div id="invoice" class="invoice"></div>
       <div class="invoice-actions">
-        <button type="button" id="print-invoice">Print / Save PDF</button>
+        <button type="button" id="download-invoice">Download PDF</button>
+        <button type="button" id="email-invoice">Email invoice</button>
         <button type="button" id="close-invoice" class="ghost">Close</button>
       </div>
     </dialog>
