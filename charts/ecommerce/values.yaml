@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce
-  tag: "0f4a056"
+  tag: "124614d"
   pullPolicy: IfNotPresent
 
 service:
