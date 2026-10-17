@@ -5,7 +5,7 @@ const { PRODUCTS, calculateTotals, buildInvoice } = require("./lib/cart");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const COMPANY_NAME = process.env.COMPANY_NAME || "Observability Market";
+const COMPANY_NAME = process.env.COMPANY_NAME || "ExcelCloud Market";
 
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
@@ -66,7 +66,7 @@ app.post("/api/checkout", (req, res) => {
       companyName: COMPANY_NAME,
       customer,
       totals,
-      logoPath: "/assets/logo.svg",
+      logoPath: "/assets/logo.jpg",
     });
     invoicesCreated.inc();
     res.status(201).json(invoice);

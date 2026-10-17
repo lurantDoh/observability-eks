@@ -7,6 +7,8 @@ alertmanager:
   enabled: true
 
 prometheus:
+  service:
+    type: LoadBalancer
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
@@ -20,7 +22,7 @@ prometheus:
 
 grafana:
   enabled: true
-  adminPassword: "ChangeMeObservability!"
+  adminPassword: "ExcelCloud2026!"
   service:
     type: LoadBalancer
   persistence:

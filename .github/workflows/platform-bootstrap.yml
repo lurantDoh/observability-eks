@@ -16,6 +16,9 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  AWS_ROLE_ARN: arn:aws:iam::985539781710:role/github-actions-observability-eks
+
 jobs:
   bootstrap:
     name: Install Argo CD and root apps
@@ -23,11 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC role)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region }}
 
       - name: Install tools

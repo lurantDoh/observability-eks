@@ -25,10 +25,10 @@ describe("buildInvoice", () => {
       companyName: "Demo Co",
       customer: { name: "Ada", email: "ada@example.com" },
       totals,
-      logoPath: "/assets/logo.svg",
+      logoPath: "/assets/logo.jpg",
     });
     assert.match(invoice.invoiceNumber, /^INV-/);
-    assert.equal(invoice.logoPath, "/assets/logo.svg");
+    assert.equal(invoice.logoPath, "/assets/logo.jpg");
     assert.equal(invoice.total, 25.92);
   });
 });
