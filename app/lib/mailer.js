@@ -1,57 +1,17 @@
 const nodemailer = require("nodemailer");
+const { SESClient, SendRawEmailCommand } = require("@aws-sdk/client-ses");
 
 function isEmailConfigured() {
-  if (process.env.EMAIL_TRANSPORT === "ses") return Boolean(process.env.EMAIL_FROM);
+  if ((process.env.EMAIL_TRANSPORT || "").toLowerCase() === "ses") {
+    return Boolean(process.env.EMAIL_FROM);
+  }
   return Boolean(process.env.SMTP_HOST && process.env.EMAIL_FROM);
 }
 
-async function createTransport() {
-  const transport = (process.env.EMAIL_TRANSPORT || "smtp").toLowerCase();
-
-  if (transport === "ses") {
-    const { SESv2Client, SendEmailCommand } = require("@aws-sdk/client-sesv2");
-    const region = process.env.AWS_REGION || process.env.SES_REGION || "us-east-1";
-    const sesClient = new SESv2Client({ region });
-
-    return nodemailer.createTransport({
-      SES: { sesClient, SendEmailCommand },
-    });
-  }
-
-  const port = Number(process.env.SMTP_PORT || 587);
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465 || process.env.SMTP_SECURE === "true",
-    auth:
-      process.env.SMTP_USER && process.env.SMTP_PASS
-        ? {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          }
-        : undefined,
-  });
-}
-
-async function sendInvoiceEmail({ invoice, pdfBuffer }) {
-  if (!invoice.customer?.email) {
-    return { sent: false, skipped: true, reason: "No customer email provided" };
-  }
-
-  if (!isEmailConfigured()) {
-    return {
-      sent: false,
-      skipped: true,
-      reason: "Email is not configured (set EMAIL_TRANSPORT/EMAIL_FROM and SMTP_* or SES)",
-    };
-  }
-
-  const from = process.env.EMAIL_FROM;
-  const transport = await createTransport();
+function buildMailContent({ invoice, pdfBuffer }) {
   const filename = `${invoice.invoiceNumber}.pdf`;
-
-  const info = await transport.sendMail({
-    from: `"${invoice.companyName}" <${from}>`,
+  return {
+    from: `"${invoice.companyName}" <${process.env.EMAIL_FROM}>`,
     to: invoice.customer.email,
     subject: `${invoice.companyName} invoice ${invoice.invoiceNumber}`,
     text: [
@@ -79,13 +39,79 @@ async function sendInvoiceEmail({ invoice, pdfBuffer }) {
         contentType: "application/pdf",
       },
     ],
+  };
+}
+
+async function sendViaSes(mail) {
+  const region = process.env.SES_REGION || process.env.AWS_REGION || "us-east-1";
+  const ses = new SESClient({ region });
+
+  // Build a MIME message with nodemailer's stream compiler, then send with SES SendRawEmail
+  const transport = nodemailer.createTransport({
+    streamTransport: true,
+    buffer: true,
+    newline: "unix",
   });
+  const built = await transport.sendMail(mail);
+  const raw = built.message;
+
+  const result = await ses.send(
+    new SendRawEmailCommand({
+      RawMessage: { Data: raw },
+      Source: process.env.EMAIL_FROM,
+      Destinations: [mail.to],
+    })
+  );
 
   return {
     sent: true,
-    messageId: info.messageId,
-    to: invoice.customer.email,
+    messageId: result.MessageId,
+    to: mail.to,
   };
+}
+
+async function sendViaSmtp(mail) {
+  const port = Number(process.env.SMTP_PORT || 587);
+  const transport = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465 || process.env.SMTP_SECURE === "true",
+    auth:
+      process.env.SMTP_USER && process.env.SMTP_PASS
+        ? {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          }
+        : undefined,
+  });
+  const info = await transport.sendMail(mail);
+  return {
+    sent: true,
+    messageId: info.messageId,
+    to: mail.to,
+  };
+}
+
+async function sendInvoiceEmail({ invoice, pdfBuffer }) {
+  if (!invoice.customer?.email) {
+    return { sent: false, skipped: true, reason: "No customer email provided" };
+  }
+
+  if (!isEmailConfigured()) {
+    return {
+      sent: false,
+      skipped: true,
+      reason: "Email is not configured (set EMAIL_TRANSPORT/EMAIL_FROM and SMTP_* or SES)",
+    };
+  }
+
+  const mail = buildMailContent({ invoice, pdfBuffer });
+  const transport = (process.env.EMAIL_TRANSPORT || "smtp").toLowerCase();
+
+  if (transport === "ses") {
+    return sendViaSes(mail);
+  }
+  return sendViaSmtp(mail);
 }
 
 module.exports = { sendInvoiceEmail, isEmailConfigured };

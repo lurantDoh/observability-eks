@@ -100,6 +100,7 @@ app.post("/api/checkout", async (req, res) => {
         emailResult = await sendInvoiceEmail({ invoice, pdfBuffer });
         if (emailResult.sent) invoicesEmailed.inc();
       } catch (err) {
+        console.error("Invoice email failed:", err);
         emailResult = {
           sent: false,
           error: err.message || "Failed to send invoice email",
@@ -107,13 +108,14 @@ app.post("/api/checkout", async (req, res) => {
       }
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       ...invoice,
       pdfUrl: `/api/invoices/${encodeURIComponent(invoice.invoiceNumber)}/pdf`,
       email: emailResult,
     });
   } catch (err) {
-    res.status(400).json({ error: err.message || "Invalid cart" });
+    console.error("Checkout failed:", err);
+    return res.status(400).json({ error: err.message || "Invalid cart" });
   }
 });
 
