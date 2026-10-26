@@ -6,7 +6,7 @@ on:
       cluster_name:
         description: EKS cluster name
         required: true
-        default: etechapp-eks-4QAQxDD3
+        default: etechapp-eks-0wtokhkG
       aws_region:
         description: AWS region
         required: true
@@ -17,7 +17,7 @@ permissions:
   id-token: write
 
 env:
-  GHA_ROLE_ARN: arn:aws:iam::985539781710:role/github-actions-observability-eks
+  GHA_ROLE_ARN: arn:aws:iam::027024089660:role/github-actions-observability-eks
 
 jobs:
   bootstrap:

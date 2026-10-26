@@ -2,8 +2,8 @@
 
 Ecommerce cart + invoice app on Amazon EKS with **Helm**, **Argo CD**, **Prometheus**, **Grafana**, and **GitHub Actions**.
 
-Target cluster (current default): `etechapp-eks-4QAQxDD3` in `us-east-2`  
-Image registry: `985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce`
+Target cluster (current default): `etechapp-eks-0wtokhkG` in `us-east-2`
+Image registry: `027024089660.dkr.ecr.us-east-2.amazonaws.com/ecommerce`
 
 ## What you get
 
@@ -63,12 +63,12 @@ In the repo settings, add:
 **Option A — GitHub Actions**
 
 1. Open **Actions → Platform Bootstrap → Run workflow**
-2. Confirm cluster `etechapp-eks-4QAQxDD3` / region `us-east-2`
+2. Confirm cluster `etechapp-eks-0wtokhkG` / region `us-east-2`
 
 **Option B — local**
 
 ```bash
-export CLUSTER_NAME=etechapp-eks-4QAQxDD3
+export CLUSTER_NAME=etechapp-eks-0wtokhkG
 export AWS_REGION=us-east-2
 ./scripts/bootstrap.sh
 ```

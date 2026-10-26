@@ -5,7 +5,7 @@
       "Sid": "GitHubActionsObservabilityEks",
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::985539781710:oidc-provider/token.actions.githubusercontent.com"
+        "Federated": "arn:aws:iam::027024089660:oidc-provider/token.actions.githubusercontent.com"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
@@ -14,8 +14,8 @@
         },
         "StringLike": {
           "token.actions.githubusercontent.com:sub": [
-            "repo:training-ux/observability-eks:*",
-            "repo:training-ux@*/observability-eks@*:*"
+            "repo:lurantDoh/observability-eks:*",
+            "repo:lurantDoh@*/observability-eks@*:*"
           ]
         }
       }

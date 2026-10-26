@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/training-ux/observability-eks.git
+    repoURL: https://github.com/lurantDoh/observability-eks.git
     targetRevision: main
     path: charts/ecommerce
     helm:

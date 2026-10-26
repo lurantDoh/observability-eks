@@ -22,7 +22,7 @@
         "ecr:ListImages",
         "ecr:DescribeImages"
       ],
-      "Resource": "arn:aws:ecr:us-east-2:985539781710:repository/ecommerce"
+      "Resource": "arn:aws:ecr:us-east-2:027024089660:repository/newapp"
     },
     {
       "Sid": "EKSAccess",
@@ -32,7 +32,7 @@
         "eks:ListClusters",
         "eks:AccessKubernetesApi"
       ],
-      "Resource": "arn:aws:eks:us-east-2:985539781710:cluster/etechapp-eks-4QAQxDD3"
+      "Resource": "arn:aws:eks:us-east-2:027024089660:cluster/etechapp-eks-0wtokhkG"
     }
   ]
 }

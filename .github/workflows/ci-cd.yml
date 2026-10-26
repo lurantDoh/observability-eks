@@ -13,9 +13,9 @@ permissions:
 
 env:
   AWS_REGION: us-east-2
-  GHA_ROLE_ARN: arn:aws:iam::985539781710:role/github-actions-observability-eks
-  ECR_REPOSITORY: ecommerce
-  CLUSTER_NAME: etechapp-eks-4QAQxDD3
+  GHA_ROLE_ARN: arn:aws:iam::027024089660:role/github-actions-observability-eks
+  ECR_REPOSITORY: newapp
+  CLUSTER_NAME: etechapp-eks-0wtokhkG
 
 jobs:
   test:

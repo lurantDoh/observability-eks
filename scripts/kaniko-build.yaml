@@ -25,11 +25,11 @@ spec:
         - name: kaniko
           image: gcr.io/kaniko-project/executor:v1.23.2
           args:
-            - --context=git://github.com/training-ux/observability-eks.git#refs/heads/main
+            - --context=git://github.com/lurantDoh/observability-eks.git#refs/heads/main
             - --context-sub-path=app
             - --dockerfile=Dockerfile
-            - --destination=985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce:excelcloud
-            - --destination=985539781710.dkr.ecr.us-east-2.amazonaws.com/ecommerce:latest
+            - --destination=027024089660.dkr.ecr.us-east-2.amazonaws.com/ecommerce:excelcloud
+            - --destination=027024089660.dkr.ecr.us-east-2.amazonaws.com/ecommerce:latest
             - --cache=false
           volumeMounts:
             - name: docker-config

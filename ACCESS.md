@@ -1,6 +1,6 @@
-# Access URLs — etechapp-eks-4QAQxDD3 (us-east-2)
+# Access URLs — etechapp-eks-0wtokhkG (us-east-2)
 
-Repo: https://github.com/training-ux/observability-eks
+Repo: https://github.com/lurantDoh/observability-eks
 
 ## Apps
 
@@ -19,9 +19,9 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 ## IAM role (GitHub Actions OIDC)
 
-`arn:aws:iam::985539781710:role/github-actions-observability-eks`
+`arn:aws:iam::027024089660:role/github-actions-observability-eks`
 
-Trusted for `repo:training-ux/observability-eks:*` via `token.actions.githubusercontent.com`.
+Trusted for `repo:lurantDoh/observability-eks:*` via `token.actions.githubusercontent.com`.
 Mapped in `aws-auth` as `system:masters`.
 
 No long-lived AWS access keys are required in GitHub secrets.

@@ -4,9 +4,9 @@ set -euo pipefail
 # Bootstrap Argo CD on the current kube-context, then apply the root app-of-apps.
 # Prerequisites: kubectl, helm, aws cli, cluster admin access.
 
-CLUSTER_NAME="${CLUSTER_NAME:-etechapp-eks-4QAQxDD3}"
+CLUSTER_NAME="${CLUSTER_NAME:-etechapp-eks-0wtokhkG}"
 AWS_REGION="${AWS_REGION:-us-east-2}"
-REPO_URL="${REPO_URL:-https://github.com/training-ux/observability-eks.git}"
+REPO_URL="${REPO_URL:-https://github.com/lurantDoh/observability-eks.git}"
 
 echo "==> Updating kubeconfig for ${CLUSTER_NAME} (${AWS_REGION})"
 aws eks update-kubeconfig --name "${CLUSTER_NAME}" --region "${AWS_REGION}"
@@ -28,7 +28,7 @@ kubectl -n argocd rollout status deploy/argocd-server --timeout=300s
 
 echo "==> Applying root Application (repo: ${REPO_URL})"
 # Allow editing the repo URL without committing secrets into bootstrap
-sed "s|https://github.com/training-ux/observability-eks.git|${REPO_URL}|g" \
+sed "s|https://github.com/lurantDoh/observability-eks.git|${REPO_URL}|g" \
   gitops/argocd/root-app.yaml | kubectl apply -f -
 
 echo

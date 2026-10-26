@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/training-ux/observability-eks.git
+    repoURL: https://github.com/lurantDoh/observability-eks.git
     targetRevision: main
     path: gitops/argocd/apps
   destination:
