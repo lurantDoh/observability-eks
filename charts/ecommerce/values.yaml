@@ -28,7 +28,7 @@ resources:
     memory: 512Mi
 
 env:
-  COMPANY_NAME: "ExcelCloud Market"
+  COMPANY_NAME: "NexT GEN MARKETPLACE"
 
 serviceAccount:
   create: true
