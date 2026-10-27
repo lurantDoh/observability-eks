@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 027024089660.dkr.ecr.us-east-2.amazonaws.com/newapp
-  tag: "a91e599"
+  tag: "6d2379c"
   pullPolicy: IfNotPresent
 
 service:
