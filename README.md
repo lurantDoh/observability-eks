@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # observability-eks
 
 Ecommerce cart + invoice app on Amazon EKS with **Helm**, **Argo CD**, **Prometheus**, **Grafana**, and **GitHub Actions**.
@@ -128,3 +129,7 @@ helm upgrade --install ecommerce ./charts/ecommerce \
 - ServiceMonitor is enabled so Prometheus scrapes `/metrics` once the operator CRDs exist.
 - Sync waves: platform observability first, then ecommerce (`argocd.argoproj.io/sync-wave` on apps).
 - Replace the placeholder logo before demos.
+=======
+# observability-eks
+REPO for e-commerce Application 
+>>>>>>> f3a6555ee7ec63a2cfae52d89538ccf40fb9852d
