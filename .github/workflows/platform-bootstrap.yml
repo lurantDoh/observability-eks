@@ -6,7 +6,7 @@ on:
       cluster_name:
         description: EKS cluster name
         required: true
-        default: etechapp-eks-0wtokhkG
+        default: etechapp-eks-HUSXNOnV
       aws_region:
         description: AWS region
         required: true

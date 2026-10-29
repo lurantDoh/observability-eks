@@ -32,7 +32,7 @@
         "eks:ListClusters",
         "eks:AccessKubernetesApi"
       ],
-      "Resource": "arn:aws:eks:us-east-2:027024089660:cluster/etechapp-eks-0wtokhkG"
+      "Resource": "arn:aws:eks:us-east-2:027024089660:cluster/etechapp-eks-HUSXNOnV"
     }
   ]
 }
